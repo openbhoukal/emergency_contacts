@@ -50,9 +50,7 @@ pip-delete-this-directory.txt
 poetry.lock
 requirements-dev.txt
 
-# Node (in case of future frontend)
-node_modules/
-package-lock.json
-yarn.lock
+#migrations
+migrations/
 
 
