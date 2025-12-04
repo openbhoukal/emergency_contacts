@@ -1,0 +1,35 @@
+.navbar {
+  background-color: #f8f9fa;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 0;
+}
+
+.navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-decoration: none;
+}
+
+.navbar-brand:hover {
+  text-decoration: underline;
+}
+
+.navbar-brand:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.main-content {
+  min-height: calc(100vh - 80px);
+  background-color: #f8f9fa;
+}

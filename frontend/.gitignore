@@ -1,0 +1,12 @@
+node_modules/
+dist/
+tmp/
+temp/
+*.log
+package-lock.json
+.angular/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+

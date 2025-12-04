@@ -1,0 +1,58 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django / Python
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+.Python
+
+# Environment variables / secrets
+.env
+.env.*
+env/
+venv/
+ENV/
+.venv/
+
+# IDE / editor settings
+.idea/
+.vscode/
+*.iml
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Static & media (generated)
+media/
+staticfiles/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Local scripts / dumps
+*.sql
+!db_schema.sql
+
+# pip/poetry
+pip-log.txt
+pip-delete-this-directory.txt
+poetry.lock
+requirements-dev.txt
+
+# Node (in case of future frontend)
+node_modules/
+package-lock.json
+yarn.lock
+
+

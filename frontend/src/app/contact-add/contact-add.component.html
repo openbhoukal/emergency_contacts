@@ -1,0 +1,270 @@
+<div class="form-container">
+  <h1>Create Enterprise Emergency Contact</h1>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error" role="alert" aria-live="polite">
+      <span class="alert-icon" aria-hidden="true">⚠️</span>
+      {{ errorMessage() }}
+      <button 
+        type="button"
+        class="alert-close"
+        (click)="errorMessage.set(null)"
+        aria-label="Close error message">
+        ×
+      </button>
+    </div>
+  }
+
+  <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" novalidate>
+    <div class="form-section">
+      <h2>Contact Information</h2>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first_name" class="form-label">
+            First Name
+            <span class="required" aria-label="required">*</span>
+          </label>
+          <input
+            id="first_name"
+            type="text"
+            class="form-control"
+            [class.invalid]="isFieldInvalid('first_name')"
+            formControlName="first_name"
+            placeholder="Enter first name"
+            aria-describedby="first_name_error"
+            aria-required="true"
+          />
+          @if (getFieldError('first_name')) {
+            <span id="first_name_error" class="error-message" role="alert">
+              {{ getFieldError('first_name') }}
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="last_name" class="form-label">
+            Last Name
+            <span class="required" aria-label="required">*</span>
+          </label>
+          <input
+            id="last_name"
+            type="text"
+            class="form-control"
+            [class.invalid]="isFieldInvalid('last_name')"
+            formControlName="last_name"
+            placeholder="Enter last name"
+            aria-describedby="last_name_error"
+            aria-required="true"
+          />
+          @if (getFieldError('last_name')) {
+            <span id="last_name_error" class="error-message" role="alert">
+              {{ getFieldError('last_name') }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">
+          Email Address
+          <span class="required" aria-label="required">*</span>
+        </label>
+        <input
+          id="email"
+          type="email"
+          class="form-control"
+          [class.invalid]="isFieldInvalid('email')"
+          formControlName="email"
+          placeholder="Enter email address"
+          aria-describedby="email_error"
+          aria-required="true"
+        />
+        @if (getFieldError('email')) {
+          <span id="email_error" class="error-message" role="alert">
+            {{ getFieldError('email') }}
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="mobile_number" class="form-label">Mobile Number</label>
+        <div class="mobile-input-group">
+          <select
+            id="country_code"
+            class="form-control country-code-select"
+            formControlName="country_code"
+            aria-label="Country code">
+            @for (country of countryCodes; track country.code) {
+              <option [value]="country.dialCode">
+                {{ country.name }}({{ country.dialCode }})
+              </option>
+            }
+          </select>
+          <input
+            id="mobile_number"
+            type="tel"
+            class="form-control mobile-input"
+            [class.invalid]="isFieldInvalid('mobile_number')"
+            formControlName="mobile_number"
+            placeholder="Enter 10 digit mobile number"
+            aria-describedby="mobile_number_error"
+            maxlength="10"
+          />
+        </div>
+        @if (getFieldError('mobile_number')) {
+          <span id="mobile_number_error" class="error-message" role="alert">
+            {{ getFieldError('mobile_number') }}
+          </span>
+        }
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>Event Notification</h2>
+      <div class="form-group">
+        <fieldset>
+          <legend class="sr-only">Event notification type</legend>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input
+                id="notification_all_users"
+                type="radio"
+                formControlName="event_notification_type"
+                value="ALL_USERS"
+                aria-describedby="notification_all_users_desc"
+              />
+              <label for="notification_all_users">
+                All Organizational App Users
+              </label>
+            </div>
+            <div class="radio-option">
+              <input
+                id="notification_groups"
+                type="radio"
+                formControlName="event_notification_type"
+                value="GROUPS"
+                aria-describedby="notification_groups_desc"
+              />
+              <label for="notification_groups">
+                Select Notification Groups
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        @if (isGroupsSelected) {
+          <div class="groups-input-container">
+            <div class="groups-input-wrapper">
+              <input
+                type="text"
+                class="form-control groups-input"
+                [value]="groupInput()"
+                (input)="groupInput.set($any($event.target).value)"
+                (keydown)="onGroupInputKeydown($event)"
+                placeholder="Enter group name and press Enter"
+                aria-label="Add notification group"
+              />
+              <button
+                type="button"
+                class="btn btn-secondary add-group-btn"
+                (click)="addGroup()"
+                aria-label="Add notification group">
+                Add
+              </button>
+            </div>
+            @if (selectedGroups().length > 0) {
+              <div class="groups-tags" role="list" aria-label="Selected notification groups">
+                @for (group of selectedGroups(); track group) {
+                  <span class="group-tag" role="listitem">
+                    {{ group }}
+                    <button
+                      type="button"
+                      class="tag-remove"
+                      (click)="removeGroup(group)"
+                      [aria-label]="'Remove group ' + group">
+                      ×
+                    </button>
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>Event Types</h2>
+      <div class="form-group">
+        <fieldset>
+          <legend class="sr-only">Select event types</legend>
+          <div class="checkbox-group checkbox-group-horizontal">
+            @for (eventType of eventTypes; track eventType.value; let i = $index) {
+              <div class="checkbox-option">
+                <input
+                  [id]="'event_type_' + eventType.value"
+                  type="checkbox"
+                  [formControl]="eventTypesFormArray.at(i)"
+                />
+                <label [for]="'event_type_' + eventType.value">
+                  {{ eventType.label }}
+                </label>
+              </div>
+            }
+          </div>
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>Status</h2>
+      <div class="form-group">
+        <fieldset>
+          <legend class="sr-only">Contact status</legend>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input
+                id="status_active"
+                type="radio"
+                formControlName="status"
+                value="ACTIVE"
+              />
+              <label for="status_active">Active</label>
+            </div>
+            <div class="radio-option">
+              <input
+                id="status_inactive"
+                type="radio"
+                formControlName="status"
+                value="INACTIVE"
+              />
+              <label for="status_inactive">Inactive</label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn btn-primary submit-btn"
+        [disabled]="loading()">
+        @if (loading()) {
+          <span aria-hidden="true">⏳</span>
+          Submitting...
+        } @else {
+          SUBMIT
+        }
+      </button>
+      <button
+        type="button"
+        class="btn btn-secondary cancel-btn"
+        (click)="onCancel()"
+        [disabled]="loading()">
+        CANCEL
+      </button>
+    </div>
+  </form>
+</div>

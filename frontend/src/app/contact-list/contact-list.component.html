@@ -1,0 +1,211 @@
+<div class="contact-list-container">
+  <header class="page-header">
+    <h1>Enterprise Emergency Contacts</h1>
+    <button 
+      type="button"
+      class="btn btn-primary new-contact-btn"
+      routerLink="/contacts/new"
+      aria-label="Create new emergency contact">
+      NEW CONTACT
+    </button>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error" role="alert" aria-live="polite">
+      <span class="alert-icon" aria-hidden="true">⚠️</span>
+      {{ errorMessage() }}
+      <button 
+        type="button"
+        class="alert-close"
+        (click)="errorMessage.set(null)"
+        aria-label="Close error message">
+        ×
+      </button>
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="alert alert-success" role="alert" aria-live="polite">
+      <span class="alert-icon" aria-hidden="true">✓</span>
+      {{ successMessage() }}
+      <button 
+        type="button"
+        class="alert-close"
+        (click)="successMessage.set(null)"
+        aria-label="Close success message">
+        ×
+      </button>
+    </div>
+  }
+
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="search-input" class="filter-label">Search</label>
+      <input
+        id="search-input"
+        type="text"
+        class="form-control search-input"
+        [value]="searchTerm()"
+        (input)="onSearchChange($any($event.target).value)"
+        placeholder="Search by name, email, or mobile"
+        aria-label="Search contacts"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label for="status-filter" class="filter-label">Status</label>
+      <select
+        id="status-filter"
+        class="form-control status-select"
+        [value]="statusFilter()"
+        (change)="onStatusFilterChange($any($event.target).value)"
+        aria-label="Filter by status">
+        <option value="all">All</option>
+        <option value="ACTIVE">Active</option>
+        <option value="INACTIVE">Inactive</option>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button
+        type="button"
+        class="btn btn-secondary filter-btn"
+        (click)="clearFilters()"
+        aria-label="Clear all filters">
+        CLEAR
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-spinner" role="status" aria-label="Loading contacts">
+      <span class="sr-only">Loading...</span>
+      Loading contacts...
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="contacts-table" role="table" aria-label="Emergency contacts">
+        <thead>
+          <tr>
+            <th>
+              <button
+                type="button"
+                class="sort-button"
+                (click)="onSort('first_name')"
+                aria-label="Sort by first name">
+                First Name {{ getSortIcon('first_name') }}
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                class="sort-button"
+                (click)="onSort('last_name')"
+                aria-label="Sort by last name">
+                Last Name {{ getSortIcon('last_name') }}
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                class="sort-button"
+                (click)="onSort('email')"
+                aria-label="Sort by email">
+                Email {{ getSortIcon('email') }}
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                class="sort-button"
+                (click)="onSort('mobile_number')"
+                aria-label="Sort by mobile number">
+                Mobile {{ getSortIcon('mobile_number') }}
+              </button>
+            </th>
+            <th>Event Types</th>
+            <th>
+              <button
+                type="button"
+                class="sort-button"
+                (click)="onSort('status')"
+                aria-label="Sort by status">
+                Active {{ getSortIcon('status') }}
+              </button>
+            </th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (contacts().length === 0) {
+            <tr>
+              <td colspan="7" class="no-data">
+                No contacts found. 
+                @if (searchTerm() || statusFilter() !== 'all') {
+                  Try adjusting your filters.
+                } @else {
+                  <a routerLink="/contacts/new">Create a new contact</a> to get started.
+                }
+              </td>
+            </tr>
+          } @else {
+            @for (contact of contacts(); track contact.id) {
+              <tr>
+                <td>{{ contact.first_name }}</td>
+                <td>{{ contact.last_name }}</td>
+                <td>{{ contact.email }}</td>
+                <td>{{ formatMobileNumber(contact) || '-' }}</td>
+                <td>{{ formatEventTypes(contact.event_types) }}</td>
+                <td>
+                  <span class="status-badge" [class.active]="contact.status === 'ACTIVE'">
+                    <span class="sr-only">{{ contact.status === 'ACTIVE' ? 'Active' : 'Inactive' }}</span>
+                    @if (contact.status === 'ACTIVE') {
+                      <span aria-hidden="true">✓</span>
+                    } @else {
+                      <span aria-hidden="true">✗</span>
+                    }
+                  </span>
+                </td>
+                <td>
+                  <a
+                    [routerLink]="['/contacts', contact.id]"
+                    class="edit-link"
+                    [aria-label]="'Edit contact ' + contact.first_name + ' ' + contact.last_name">
+                    Edit
+                  </a>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (hasPrevious() || hasNext()) {
+      <nav class="pagination" aria-label="Contacts pagination">
+        <button
+          type="button"
+          class="pagination-btn"
+          [disabled]="!hasPrevious()"
+          (click)="onPageChange(currentPage() - 1)"
+          aria-label="Go to previous page">
+          Previous
+        </button>
+        <span class="pagination-info" aria-live="polite">
+          Page {{ currentPage() }}
+          @if (totalPages() > 0) {
+            of {{ totalPages() }}
+          }
+        </span>
+        <button
+          type="button"
+          class="pagination-btn"
+          [disabled]="!hasNext()"
+          (click)="onPageChange(currentPage() + 1)"
+          aria-label="Go to next page">
+          Next
+        </button>
+      </nav>
+    }
+  }
+</div>
